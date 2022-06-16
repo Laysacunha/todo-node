@@ -33,12 +33,14 @@ app.post('/users', (request, response) => {
     return response.status(201).send(newUser);
   };
   return response.status(400).json({error: "User already exists!"});
+  
 });
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
   const { username } = request.headers;
   const todosUser = users.find((user) => user.username === username);
   return response.send(todosUser.todos);
+
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
@@ -54,24 +56,20 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
   console.log(users);
   user.todos.push(newTodo);
   return response.status(201).send(newTodo);
+  
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body;
   const { id } = request.params;
   const { user } = request;
-  let todoExists = false;
-  user.todos.forEach(todoItem => {
-    if(todoItem.id === id){
-      todoItem.title = title;
-      todoItem.deadline = deadline;
-      todoExists = true;
-    }
-  });
-  if (todoExists){ 
-    return response.json(user.todos); 
-  }
-  return response.json({error: "Todo item not found!"});
+  const todoItemEdit = user.todos.find((todoItem) => todoItem.id === id);
+  if(todoItemEdit){
+    todoItemEdit.title = title;
+    todoItemEdit.deadline = deadline;
+    return response.send(todoItemEdit);
+  };
+  return response.status(404).json({error: "Todo item doesn't exists!"});
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
