@@ -68,22 +68,29 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
     todoItemEdit.deadline = deadline;
     return response.send(todoItemEdit);
   };
-  return response.status(404).json({error: "Todo item doesn't exists!"});
+  return response.status(404).json({error: "Todo item not found!"});
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const { id } = request.params;
-  const todoItemEdit = user.todos.find((todoItem) => todoItem.id === id);
-  if(todoItemEdit){
-    todoItemEdit.done = true;
-    return response.send(todoItemEdit);
+  const todoItemDone = user.todos.find((todoItem) => todoItem.id === id);
+  if(todoItemDone){
+    todoItemDone.done = true;
+    return response.send(todoItemDone);
   };
-  return response.status(404).json({error: "Todo item doesn't exists!"});
+  return response.status(404).json({error: "Todo item not found!"});
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+  const { id } = request.params;
+  const todoItemDelete = user.todos.find((todoItem) => todoItem.id === id);
+  if(todoItemDelete){
+    user.todos.splice(user.todos.indexOf(todoItemDelete), 1);
+    return response.status(204).send();
+  }
+  return response.status(404).json({error: "Todo item no found!"});
 });
 
 module.exports = app;
